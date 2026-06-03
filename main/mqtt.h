@@ -1,8 +1,10 @@
 #ifndef MQTT_H
 #define MQTT_H
 
+#include "stdint.h"
+
 extern uint32_t mqtt_publish(const char *topic, const char *data, uint32_t len, uint8_t qos, uint8_t retain);
-extern void mqtt_app_start(void);
+extern void mqtt_app_start(const uint8_t *const broker_url);
 extern uint8_t mqtt_isConnected(void);
 
 
