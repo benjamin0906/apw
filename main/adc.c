@@ -7,6 +7,7 @@
 
 static const char *TAG = "adc_example";
 adc_cali_handle_t adc1_cali_chan0_handle = NULL;
+adc_cali_handle_t adc1_cali_chan3_handle = NULL;
 adc_oneshot_unit_handle_t handle;
 
 static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle)
@@ -69,22 +70,32 @@ void adc_init(void)
     adc_oneshot_new_unit(&init_config1, &handle);
 
     adc_oneshot_config_channel(handle, EXAMPLE_ADC1_CHAN0, &config);
+    adc_oneshot_config_channel(handle, ADC_CHANNEL_3, &config);
 
     example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN0, EXAMPLE_ADC_ATTEN, &adc1_cali_chan0_handle);
+    example_adc_calibration_init(ADC_UNIT_1, ADC_CHANNEL_3, EXAMPLE_ADC_ATTEN, &adc1_cali_chan3_handle);
 }
 
-uint16_t adc_get_raw(void)
+uint16_t adc_get_raw(adc_channel_t ch)
 {
     int ret = 0;
-    adc_oneshot_read(handle, EXAMPLE_ADC1_CHAN0, &ret);
+    adc_oneshot_read(handle, ch, &ret);
     return (uint16_t)ret;
 }
 
-uint16_t adc_get_volt(void)
+uint16_t adc_get_volt(adc_channel_t ch)
 {
     int voltage = 0;
-    uint16_t raw = adc_get_raw();
-    adc_cali_raw_to_voltage(adc1_cali_chan0_handle, raw, &voltage);
+    uint16_t raw = adc_get_raw(ch);
+    if(ch == ADC_CHANNEL_2)
+    {
+        adc_cali_raw_to_voltage(adc1_cali_chan0_handle, raw, &voltage);
+    }
+    else if(ch == ADC_CHANNEL_3)
+    {
+        adc_cali_raw_to_voltage(adc1_cali_chan3_handle, raw, &voltage);
+    }
+    
     return (uint16_t)voltage;
 }
 
